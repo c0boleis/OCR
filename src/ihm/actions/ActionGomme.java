@@ -17,6 +17,7 @@ import javax.swing.event.ChangeListener;
 import org.apache.log4j.Logger;
 
 import ihm.MainFrame;
+import ihm.PanelOCR;
 
 public class ActionGomme extends ActionOcr implements MouseMotionListener{
 
@@ -65,6 +66,7 @@ public class ActionGomme extends ActionOcr implements MouseMotionListener{
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		this.setDone(true);
 		setActive(!isActive());
 	}
 
@@ -76,11 +78,11 @@ public class ActionGomme extends ActionOcr implements MouseMotionListener{
 	public void mouseDragged(MouseEvent e) {
 		// TODO Auto-generated method stub
 		LOGGER.debug("Gomme.mouseDragged x: "+e.getX()+"\ty: "+e.getY());
-		double z = MainFrame.get().getPanelImage().getZoomFact();
+		double z = PanelOCR.get().getPanelImage().getZoomFact();
 		int x = (int) (e.getX()/z);
 		int y = (int) (e.getY()/z);
 		points.add(new PointGomme(x, y,ActionGomme.TAILLE_GOMME));
-		MainFrame.get().getPanelImage().repaint();
+		PanelOCR.get().getPanelImage().repaint();
 	}
 
 	@Override
@@ -97,10 +99,10 @@ public class ActionGomme extends ActionOcr implements MouseMotionListener{
 		super.setActive(act);
 		if(act) {
 			points.clear();
-			MainFrame.get().getPanelImage().addMouseMotionListener(this);
+			PanelOCR.get().getPanelImage().addMouseMotionListener(this);
 			LOGGER.debug("ajout MouseMotionListener dans le PanelImage");
 		}else {
-			MainFrame.get().getPanelImage().removeMouseMotionListener(this);
+			PanelOCR.get().getPanelImage().removeMouseMotionListener(this);
 			LOGGER.debug("supression MouseMotionListener dans le PanelImage");
 		}
 	}

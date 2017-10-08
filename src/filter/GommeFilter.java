@@ -1,10 +1,9 @@
 package filter;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RGBImageFilter;
 
-import ihm.MainFrame;
+import ihm.PanelOCR;
 import ihm.actions.ActionGomme;
 import ihm.actions.ActionOcr;
 import ihm.actions.PointGomme;
@@ -16,7 +15,7 @@ public class GommeFilter extends RGBImageFilter{
 	
 	
 	public GommeFilter() {
-		BufferedImage image = MainFrame.get().getPanelImage().getImage();
+		BufferedImage image = PanelOCR.getImage();
 		int width = image.getWidth();
 		int height = image.getHeight();
 		//init tab;

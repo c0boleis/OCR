@@ -5,8 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -15,11 +13,7 @@ import javax.swing.JPanel;
 
 import com.asprise.ocr.Ocr;
 
-import ihm.MainFrame;
-import net.sourceforge.javaocr.Image;
-import net.sourceforge.javaocr.awt.AwtImage;
-import net.sourceforge.javaocr.ocr.Shrinker;
-import net.sourceforge.javaocr.ocrPlugins.charExtractor.CharacterExtractor;
+import ihm.PanelOCR;
 
 public class ActionOCRCalcul extends ActionOcr{
 
@@ -63,7 +57,7 @@ public class ActionOCRCalcul extends ActionOcr{
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					File fileOutput = new File("tmp.png");
-					BufferedImage image = MainFrame.get().getImage();
+					BufferedImage image = PanelOCR.getImage();
 					try {
 						ImageIO.write(image, "png", fileOutput );
 					} catch (IOException e1) {

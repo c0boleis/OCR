@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
-import ihm.MainFrame;
+import ihm.PanelOCR;
 
 public class ActionOpen extends ActionOcr{
 
@@ -28,6 +28,7 @@ public class ActionOpen extends ActionOcr{
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		this.setDone(false);
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new File("images"));
 		fileChooser.showOpenDialog(null);
@@ -38,8 +39,9 @@ public class ActionOpen extends ActionOcr{
 		System.out.println(file.getAbsolutePath());
 		try {
 			BufferedImage image = ImageIO.read(file);
-			MainFrame.get().getPanelImage().setImage(image);
-			MainFrame.get().repaint();
+			PanelOCR.setImage(image);
+			PanelOCR.get().repaint();
+			this.setDone(true);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

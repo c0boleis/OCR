@@ -1,4 +1,8 @@
 /images
 /doc
+/release
 *.log
 *.png
+/bin
+/bin_teste/
+/bin_/

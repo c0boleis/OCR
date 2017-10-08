@@ -16,11 +16,35 @@ public abstract class ActionOcr extends AbstractAction {
 	 */
 	private static final long serialVersionUID = -3374833288984520537L;
 	
+	private static final Logger LOGGER = Logger.getLogger(ActionOcr.class);
+	
 	private boolean active = false;
 	
 	private static List<ActionOcr> actions = new ArrayList<ActionOcr>();
 	
-	private static List<ActionOCRListener> listeners = new ArrayList<ActionOCRListener>();
+	private List<ActionOCRListener> listeners = new ArrayList<ActionOCRListener>();
+	
+	private static List<ActionAllOCRListener> listenersAll = new ArrayList<ActionAllOCRListener>();
+	
+	private boolean done = false;
+	
+	private boolean enable = false;
+	
+	private static ActionOCRListener actionOCRListener = new ActionOCRListener() {
+
+		@Override
+		public void enableChange(boolean oldEnable, boolean newEnable) {
+			// nothing to do
+			
+		}
+
+		@Override
+		public void doneChange(boolean oldDone, boolean newDone) {
+			checkEnable();
+		}
+		
+		
+	};
 	
 	/**
 	 * @param name
@@ -43,6 +67,7 @@ public abstract class ActionOcr extends AbstractAction {
 		try {
 			Class<?> classAction = ActionOcr.class.getClassLoader().loadClass(nameId);
 			ActionOcr act =  (ActionOcr) classAction.getConstructor().newInstance();
+			act.addActionListener(actionOCRListener);
 			actions.add(act);
 			return act;
 		} catch (ClassNotFoundException | InstantiationException |
@@ -91,25 +116,109 @@ public abstract class ActionOcr extends AbstractAction {
 		return getClass().getName();
 	}
 	
-	public static void addActionListener(ActionOCRListener actionListener) {
+	public void addActionListener(ActionOCRListener actionListener) {
 		listeners.add(actionListener);
 	}
 	
-	public static void removeActionListener(ActionOCRListener actionListener) {
+	public void removeActionListener(ActionOCRListener actionListener) {
 		listeners.remove(actionListener);
 	}
-	public static ActionOCRListener[] getListeners() {
+	public ActionOCRListener[] getListeners() {
 		return listeners.toArray(new ActionOCRListener[0]);
 	}
 	
-	private void fireActionChange(ActionOcr action) {
-		ActionOCRListener[] tmp = getListeners();
-		for(ActionOCRListener listener : tmp) {
+	public static void addActionAllOCRListener(ActionAllOCRListener actionListener) {
+		listenersAll.add(actionListener);
+	}
+	
+	public static void removeActionAllOCRListener(ActionAllOCRListener actionListener) {
+		listenersAll.remove(actionListener);
+	}
+	public static ActionAllOCRListener[] getAllOCRListeners() {
+		return listenersAll.toArray(new ActionAllOCRListener[0]);
+	}
+	
+	private static void fireActionChange(ActionOcr action) {
+		ActionAllOCRListener[] tmp = getAllOCRListeners();
+		for(ActionAllOCRListener listener : tmp) {
 			listener.actionChange(action);
 		}
 	}
 	
+	private void fireDoneChange(boolean oldDone,boolean newDone) {
+		ActionOCRListener[] tmp = getListeners();
+		for(ActionOCRListener listener : tmp) {
+			listener.doneChange(oldDone, newDone);
+		}
+	}
+	
+	private void fireEnableChange(boolean oldEnable,boolean newEnable) {
+		ActionOCRListener[] tmp = getListeners();
+		for(ActionOCRListener listener : tmp) {
+			listener.enableChange(oldEnable, newEnable);
+		}
+	}
+	
 	public abstract JPanel getPanelOption();
+
+	/**
+	 * @return the enable
+	 */
+	public boolean isEnable() {
+		return enable;
+	}
+
+	/**
+	 * @param enable the enable to set
+	 */
+	public void setEnable(boolean enable) {
+		boolean oldEnable = this.enable;
+		this.enable = enable;
+		if(oldEnable != this.enable) {
+			if(this.enable) {
+				LOGGER.debug(getClass().getName()+": is enable");
+			}else {
+				LOGGER.debug(getClass().getName()+": is disable");
+			}
+			fireEnableChange(oldEnable, this.enable);
+		}
+	}
+
+	/**
+	 * @return the done
+	 */
+	public boolean isDone() {
+		return done;
+	}
+
+	/**
+	 * @param done the done to set
+	 */
+	public void setDone(boolean done) {
+		boolean oldDone = this.done;
+		this.done = done;
+		if(oldDone != this.done) {
+			fireDoneChange(oldDone, this.done);
+		}
+	}
+	
+	private static void checkEnable() {
+		ActionOpen actionOpen= (ActionOpen) getAction(ActionOpen.class.getName());
+		ActionRescale actionRescale= (ActionRescale) getAction(ActionRescale.class.getName());
+		ActionGreyScale actionGreyScale= (ActionGreyScale) getAction(ActionGreyScale.class.getName());
+		ActionGomme actionGomme= (ActionGomme) getAction(ActionGomme.class.getName());
+		ActionOCRCalcul actionOcr= (ActionOCRCalcul) getAction(ActionOCRCalcul.class.getName());
+
+		actionOpen.setEnable(true);
+		
+		actionRescale.setEnable(actionOpen.isDone());
+		
+		actionGreyScale.setEnable(actionRescale.isDone());
+		
+		actionGomme.setEnable(actionGreyScale.isDone());
+		
+		actionOcr.setEnable(actionGomme.isDone());
+	}
 
 
 }

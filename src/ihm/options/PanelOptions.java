@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import ihm.MainFrame;
-import ihm.actions.ActionOCRListener;
+import ihm.PanelOCR;
+import ihm.actions.ActionAllOCRListener;
 import ihm.actions.ActionOcr;
 
 public class PanelOptions extends JPanel {
@@ -21,7 +21,7 @@ public class PanelOptions extends JPanel {
 	 */
 	private static final long serialVersionUID = -5459710990075751869L;
 	
-	private ActionOCRListener actionListener;
+	private ActionAllOCRListener actionListener;
 	
 	private JPanel panelNorth;
 	
@@ -63,7 +63,7 @@ public class PanelOptions extends JPanel {
 				 */
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					MainFrame.get().getPanelImage().zoomMore();
+					PanelOCR.get().getPanelImage().zoomMore();
 				}
 			});
 		}
@@ -84,7 +84,7 @@ public class PanelOptions extends JPanel {
 				 */
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					MainFrame.get().getPanelImage().zoomLess();
+					PanelOCR.get().getPanelImage().zoomLess();
 				}
 			});
 		}
@@ -123,7 +123,7 @@ public class PanelOptions extends JPanel {
 		this.setLayout(new BorderLayout());
 		init();
 		this.setPreferredSize(new Dimension(200, 500));
-		ActionOcr.addActionListener(getActionListener());
+		ActionOcr.addActionAllOCRListener(getActionAllOCRListener());
 	}
 	
 	private void init() {
@@ -135,9 +135,9 @@ public class PanelOptions extends JPanel {
 	/**
 	 * @return the actionListener
 	 */
-	public ActionOCRListener getActionListener() {
+	public ActionAllOCRListener getActionAllOCRListener() {
 		if(actionListener== null) {
-			actionListener = new ActionOCRListener() {
+			actionListener = new ActionAllOCRListener() {
 				
 				@Override
 				public void actionChange(ActionOcr actionOcr) {
@@ -174,7 +174,7 @@ public class PanelOptions extends JPanel {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					MainFrame.get().getPanelImage().resetZoom();
+					PanelOCR.get().getPanelImage().resetZoom();
 				}
 			});
 		}

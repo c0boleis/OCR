@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import ihm.actions.ActionGomme;
 import ihm.actions.ActionOcr;
+import ihm.actions.ActionRescale;
 import ihm.actions.PointGomme;
 
 public class PanelImage extends JPanel{
@@ -75,6 +76,22 @@ public class PanelImage extends JPanel{
 		g.drawRect(xImage, yImage,(int)w, (int)h);
 		g.drawImage(image, xImage, yImage,(int)w,(int)h, null);
 		ActionGomme actionGomme  =(ActionGomme) ActionOcr.getAction(ActionGomme.class.getName());
+		ActionRescale act = (ActionRescale) ActionOcr.getAction(ActionRescale.class.getName());
+		if(act.isActive()) {
+			g.setColor(Color.BLUE.darker());
+			if(act.getLineSup()!=null) {
+				ActionRescale.DrawLine(act.getLineSup(), g);
+			}
+			if(act.getLineInf()!=null) {
+				ActionRescale.DrawLine(act.getLineInf(), g);
+				
+				g.setColor(Color.RED);
+				ActionRescale.DrawLine(act.getLineRight(), g);
+				g.setColor(Color.green.darker());
+				ActionRescale.DrawLine(act.getLineLeft(), g);
+			}
+		}
+		
 		PointGomme[] points = actionGomme.getPoints();
 		if(points.length<=0) {
 			return;
