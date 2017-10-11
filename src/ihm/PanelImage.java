@@ -3,6 +3,7 @@ package ihm;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
@@ -73,9 +74,10 @@ public class PanelImage extends JPanel{
 //			yImage = (int) ((heightPanel-h)/2);
 //		}
 		this.setPreferredSize(new Dimension((int)w, (int)h));
-		g.drawRect(xImage, yImage,(int)w, (int)h);
+//		g.drawRect(xImage, yImage,(int)w, (int)h);
 		g.drawImage(image, xImage, yImage,(int)w,(int)h, null);
 		ActionGomme actionGomme  =(ActionGomme) ActionOcr.getAction(ActionGomme.class.getName());
+
 		ActionRescale act = (ActionRescale) ActionOcr.getAction(ActionRescale.class.getName());
 		if(act.isActive()) {
 			g.setColor(Color.BLUE.darker());
@@ -107,6 +109,23 @@ public class PanelImage extends JPanel{
 			xG = (int) ((point.x*zoomFact)-wG/2);
 			yG = (int) ((point.y*zoomFact)-hG/2);
 			g.fillOval(xG, yG, wG, hG);
+		}
+
+		if(actionGomme.isActive()) {
+			g.setColor(Color.WHITE);
+			Point p = actionGomme.getPosition();
+			
+			if(p!=null) {
+				g.fillOval(p.x-ActionGomme.TAILLE_GOMME/2,
+						p.y-ActionGomme.TAILLE_GOMME/2,
+						ActionGomme.TAILLE_GOMME,
+						ActionGomme.TAILLE_GOMME);
+				g.setColor(Color.black);
+				g.drawOval(p.x-ActionGomme.TAILLE_GOMME/2,
+						p.y-ActionGomme.TAILLE_GOMME/2,
+						ActionGomme.TAILLE_GOMME,
+						ActionGomme.TAILLE_GOMME);
+			}
 		}
 
 	}

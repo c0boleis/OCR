@@ -127,6 +127,7 @@ public class PanelOptions extends JPanel {
 	}
 	
 	private void init() {
+		this.removeAll();
 		this.setLayout(new BorderLayout());
 		this.add(getPanelNorth(), BorderLayout.NORTH);
 		this.add(getPanelZoom(),BorderLayout.SOUTH);
@@ -142,12 +143,13 @@ public class PanelOptions extends JPanel {
 				@Override
 				public void actionChange(ActionOcr actionOcr) {
 					JPanel panel = actionOcr.getPanelOption();
-					removeAll();
 					init();
 					if(panel != null) {
 						add(panel, BorderLayout.CENTER);
+//						panel.doLayout();
+//						panel.repaint();
 					}
-					repaint();
+					PanelOCR.get().refreshOptions();
 				}
 			};
 		}

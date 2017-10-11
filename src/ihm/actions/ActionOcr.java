@@ -207,6 +207,8 @@ public abstract class ActionOcr extends AbstractAction {
 		ActionRescale actionRescale= (ActionRescale) getAction(ActionRescale.class.getName());
 		ActionGreyScale actionGreyScale= (ActionGreyScale) getAction(ActionGreyScale.class.getName());
 		ActionGomme actionGomme= (ActionGomme) getAction(ActionGomme.class.getName());
+		ActionFindLine actionFindLine= (ActionFindLine) getAction(ActionFindLine.class.getName());
+		ActionFindCharacter actionFindCharacter= (ActionFindCharacter) getAction(ActionFindCharacter.class.getName());
 		ActionOCRCalcul actionOcr= (ActionOCRCalcul) getAction(ActionOCRCalcul.class.getName());
 
 		actionOpen.setEnable(true);
@@ -217,7 +219,11 @@ public abstract class ActionOcr extends AbstractAction {
 		
 		actionGomme.setEnable(actionGreyScale.isDone());
 		
-		actionOcr.setEnable(actionGomme.isDone());
+		actionFindLine.setEnable(actionGomme.isDone());
+		
+		actionFindCharacter.setEnable(actionFindLine.isDone());
+		
+		actionOcr.setEnable(actionFindCharacter.isDone());
 	}
 
 

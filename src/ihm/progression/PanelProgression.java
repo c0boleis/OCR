@@ -1,9 +1,10 @@
 package ihm.progression;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import ihm.actions.ActionFindCharacter;
+import ihm.actions.ActionFindLine;
 import ihm.actions.ActionGomme;
 import ihm.actions.ActionGreyScale;
 import ihm.actions.ActionOCRCalcul;
@@ -26,6 +27,10 @@ public class PanelProgression extends JPanel {
 	
 	private ButtonProgression buttonGomme;
 	
+	private ButtonProgression buttonFindLine;
+	
+	private ButtonProgression buttonFindChar;
+	
 	private ButtonProgression buttonOcr;
 	
 	public PanelProgression() {
@@ -39,6 +44,8 @@ public class PanelProgression extends JPanel {
 		this.add(getButtonRescaleImage());
 		this.add(getButtonGreyScale());
 		this.add(getButtonGomme());
+		this.add(getButtonFindLine());
+		this.add(getButtonFindChar());
 		this.add(getButtonOcr());
 	}
 
@@ -101,6 +108,24 @@ public class PanelProgression extends JPanel {
 			buttonOcr.setEnabled(actionOcr.isEnable());
 		}
 		return buttonOcr;
+	}
+
+	private ButtonProgression getButtonFindLine() {
+		if( buttonFindLine == null) {
+			ActionOcr actionOcr = ActionOcr.getAction(ActionFindLine.class.getName());
+			buttonFindLine = new ButtonProgression(actionOcr);
+			buttonFindLine.setEnabled(actionOcr.isEnable());
+		}
+		return buttonFindLine;
+	}
+
+	private ButtonProgression getButtonFindChar() {
+		if( buttonFindChar == null) {
+			ActionOcr actionOcr = ActionOcr.getAction(ActionFindCharacter.class.getName());
+			buttonFindChar = new ButtonProgression(actionOcr);
+			buttonFindChar.setEnabled(actionOcr.isEnable());
+		}
+		return buttonFindChar;
 	}
 
 }

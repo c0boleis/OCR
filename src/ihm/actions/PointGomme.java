@@ -35,9 +35,5 @@ public class PointGomme extends Point {
 	public int getTaille() {
 		return taille;
 	}
-	
-	private void process() {
-		
-	}
 
 }

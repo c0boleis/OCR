@@ -1,6 +1,7 @@
 package ihm.actions;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -16,7 +17,6 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 
-import ihm.MainFrame;
 import ihm.PanelOCR;
 
 public class ActionGomme extends ActionOcr implements MouseMotionListener{
@@ -37,6 +37,8 @@ public class ActionGomme extends ActionOcr implements MouseMotionListener{
 	private JButton buttonSaveGomme;
 	
 	private JSlider slider;
+	
+	private Point position;
 
 	/**
 	 * @return the buttonSaveGomme
@@ -76,7 +78,7 @@ public class ActionGomme extends ActionOcr implements MouseMotionListener{
 	 */
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
+		this.setPosition(e.getPoint());
 		LOGGER.debug("Gomme.mouseDragged x: "+e.getX()+"\ty: "+e.getY());
 		double z = PanelOCR.get().getPanelImage().getZoomFact();
 		int x = (int) (e.getX()/z);
@@ -87,8 +89,8 @@ public class ActionGomme extends ActionOcr implements MouseMotionListener{
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		this.setPosition(e.getPoint());
+		PanelOCR.get().getPanelImage().repaint();
 	}
 
 	/* (non-Javadoc)
@@ -149,6 +151,20 @@ public class ActionGomme extends ActionOcr implements MouseMotionListener{
 			});
 		}
 		return slider;
+	}
+
+	/**
+	 * @return the position
+	 */
+	public Point getPosition() {
+		return position;
+	}
+
+	/**
+	 * @param position the position to set
+	 */
+	private void setPosition(Point position) {
+		this.position = position;
 	}
 	
 

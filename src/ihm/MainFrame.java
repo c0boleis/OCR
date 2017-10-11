@@ -1,21 +1,14 @@
 package ihm;
 
 import java.awt.BorderLayout;
-import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.Properties;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.RollingFileAppender;
-
-import ihm.options.PanelOptions;
-import ihm.progression.PanelProgression;
 
 
 public class MainFrame extends JFrame{

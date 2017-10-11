@@ -1,17 +1,8 @@
 package ihm.actions;
 
-import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-
-import ihm.MainFrame;
 
 public class ActionClose extends ActionOcr{
 
