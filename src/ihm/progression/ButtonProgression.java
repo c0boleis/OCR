@@ -28,6 +28,8 @@ public class ButtonProgression extends JPanel {
 	
 	private boolean end = false;
 	
+	private Color colorInit = null;
+	
 	public ButtonProgression(ActionOcr action) {
 		this(action,false);
 	}
@@ -52,6 +54,7 @@ public class ButtonProgression extends JPanel {
 			button = new JButton();
 			button.setAction(this.actionOcr);
 			button.setEnabled(this.actionOcr.isEnable());
+			this.colorInit = button.getBackground();
 		}
 		return button;
 	}
@@ -105,6 +108,8 @@ public class ButtonProgression extends JPanel {
 				public void doneChange(boolean oldDone, boolean newDone) {
 					if(newDone) {
 						getButton().setBackground(Color.green);
+					}else {
+						getButton().setBackground(colorInit);
 					}
 					repaint();
 				}

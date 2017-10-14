@@ -3,7 +3,6 @@ package ihm.progression;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import ihm.actions.ActionFindCharacter;
 import ihm.actions.ActionFindLine;
 import ihm.actions.ActionGomme;
 import ihm.actions.ActionGreyScale;
@@ -29,8 +28,6 @@ public class PanelProgression extends JPanel {
 	
 	private ButtonProgression buttonFindLine;
 	
-	private ButtonProgression buttonFindChar;
-	
 	private ButtonProgression buttonOcr;
 	
 	public PanelProgression() {
@@ -45,7 +42,6 @@ public class PanelProgression extends JPanel {
 		this.add(getButtonGreyScale());
 		this.add(getButtonGomme());
 		this.add(getButtonFindLine());
-		this.add(getButtonFindChar());
 		this.add(getButtonOcr());
 	}
 
@@ -117,15 +113,6 @@ public class PanelProgression extends JPanel {
 			buttonFindLine.setEnabled(actionOcr.isEnable());
 		}
 		return buttonFindLine;
-	}
-
-	private ButtonProgression getButtonFindChar() {
-		if( buttonFindChar == null) {
-			ActionOcr actionOcr = ActionOcr.getAction(ActionFindCharacter.class.getName());
-			buttonFindChar = new ButtonProgression(actionOcr);
-			buttonFindChar.setEnabled(actionOcr.isEnable());
-		}
-		return buttonFindChar;
 	}
 
 }

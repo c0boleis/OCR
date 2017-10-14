@@ -21,12 +21,12 @@ import ihm.PanelOCR;
 public class ActionRescale extends ActionOcr implements MouseMotionListener,MouseListener{
 
 	private static final Logger LOGGER = Logger.getLogger(ActionRescale.class);
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4389402422581243423L;
-	
+
 	public static void DrawLine(Line2D.Float line,Graphics g) {
 		g.drawLine(
 				(int)line.getX1(), 
@@ -34,7 +34,7 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 				(int)line.getX2(), 
 				(int)line.getY2());
 	}
-	
+
 	private Line2D.Float  lineInf = null;
 
 	private boolean lineInfDone = false;
@@ -42,13 +42,20 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 	private Line2D.Float lineSup = null;
 
 	private boolean lineSupDone = false;
-	
+
 	private JPanel panelOption;
-	
+
 	private List<PointGomme> points = new ArrayList<PointGomme>();
 
 	public ActionRescale() {
 		super("Rescale");
+	}
+
+	private void init() {
+		lineInf = null;
+		lineInfDone = false;
+		lineSup = null;
+		lineSupDone = false;
 	}
 
 	/*
@@ -57,7 +64,6 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		this.setDone(false);
 		setActive(!isActive());
 	}
 
@@ -129,7 +135,7 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 	public Line2D.Float getLineInf() {
 		return lineInf;
 	}
-	
+
 	public Line2D.Float getLineLeft() {
 		if(lineInf==null || lineInf==null) {
 			return null;
@@ -160,7 +166,7 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 
 		return panelOption;
 	}
-	
+
 	/**
 	 * 
 	 * @return la liste des points gommés.
@@ -186,13 +192,14 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 			createLineInf(e.getX(), e.getY());
 			lineInfDone = true;
 			//TODO fin de la définition des lignes. Début scale de l'image
-			BufferedImage image = this.scaleImage(PanelOCR.getImage());
+			BufferedImage image = this.scaleImage(getImageStart());
+			this.setImageEndAction(image);
 			PanelOCR.setImage(image);
 			this.setActive(false);
 			PanelOCR.get().getPanelImage().repaint();
 			this.setDone(true);
-//			BufferedImage imageR = this.rotateImage(image);
-////			Windows.get().getPanelImage3().setImage(imageR);
+			//			BufferedImage imageR = this.rotateImage(image);
+			////			Windows.get().getPanelImage3().setImage(imageR);
 
 		}
 	}
@@ -204,21 +211,21 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		if(lineSup==null) {
@@ -238,13 +245,13 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private BufferedImage scaleImage(BufferedImage bufIn) {
@@ -268,16 +275,16 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 		yMaxRect = Math.max(yMaxRect, lineInf.getY2());
 
 		double factZoom = PanelOCR.get().getPanelImage().getZoomFact();
-//		int xMin = (int)(xMinRect/factZoom);
-//		int xMax = (int)(xMaxRect/factZoom);
-//		int yMin = (int)(yMinRect/factZoom);
-//		int yMax = (int)(yMaxRect/factZoom);
+		//		int xMin = (int)(xMinRect/factZoom);
+		//		int xMax = (int)(xMaxRect/factZoom);
+		//		int yMin = (int)(yMinRect/factZoom);
+		//		int yMax = (int)(yMaxRect/factZoom);
 		double dxLineSup = (lineSup.getX2()-lineSup.getX1())/factZoom;
 		double dyLineSup = (lineSup.getY2()-lineSup.getY1())/factZoom;
-		
+
 		dxLineSup*=dxLineSup;
 		dyLineSup*=dyLineSup;
-		
+
 		int widthScale = (int) Math.sqrt(dxLineSup+dyLineSup);
 		int heightScale = (int)( lineSup.ptLineDist(lineInf.getP1())/factZoom);
 
@@ -295,49 +302,49 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 		double thetaDeg =  theta*180/Math.PI;
 
 		LOGGER.debug("thetha :"+thetaDeg);
-		
+
 		int xT = (int)(lineSup.getX1()/factZoom);
 		int yT = (int)(lineSup.getY1()/factZoom);
 		LOGGER.debug("xT: "+xT+"\tyT: "+yT);
 		tx.rotate(theta, xT, yT);
-		
-		
+
+
 		AffineTransformOp op = new AffineTransformOp(tx,
 				AffineTransformOp.TYPE_BILINEAR);
 
 
 		BufferedImage bufRotate = op.filter(bufIn, null);
-		
+
 		LOGGER.debug("bufOutTest.width: "+bufRotate.getWidth()+"\tbufOutTest.height: "+bufRotate.getHeight());
 		/*
 		 * rescale image
 		 */
-		
+
 		int xOriginRescale = xT;
 		int yOriginRescale = yT;
 		int widhtRescale = widthScale;
 		int heightRescale = heightScale;
 		LOGGER.debug("xT: "+xT+"\tyT: "+yT+"\twidth: "+widhtRescale+"\theight: "+heightRescale);
-		
+
 		BufferedImage bufResacled = bufRotate.getSubimage(xOriginRescale, yOriginRescale, widhtRescale, heightRescale);
-		
-		
-//		File outputfile = new File("saved_rescale.png");
-//		try {
-//			ImageIO.write(bufResacled, "png", outputfile);
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
-//		
-//		File outputfile2 = new File("saved_Rotate.png");
-//		try {
-//			ImageIO.write(bufRotate, "png", outputfile2);
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
+
+
+		//		File outputfile = new File("saved_rescale.png");
+		//		try {
+		//			ImageIO.write(bufResacled, "png", outputfile);
+		//		} catch (IOException e1) {
+		//			e1.printStackTrace();
+		//		}
+		//		
+		//		File outputfile2 = new File("saved_Rotate.png");
+		//		try {
+		//			ImageIO.write(bufRotate, "png", outputfile2);
+		//		} catch (IOException e1) {
+		//			e1.printStackTrace();
+		//		}
 		return bufResacled;
 	} 
-	
+
 	/* (non-Javadoc)
 	 * @see ihm.actions.ActionOcr#setActive(boolean)
 	 */
@@ -345,6 +352,9 @@ public class ActionRescale extends ActionOcr implements MouseMotionListener,Mous
 	public void setActive(boolean act) {
 		super.setActive(act);
 		if(act) {
+			this.setDone(false);
+			init();
+			PanelOCR.setImage(getImageStart());
 			PanelOCR.get().getPanelImage().addMouseMotionListener(this);
 			LOGGER.debug("ajout MouseMotionListener dans le PanelImage");
 			PanelOCR.get().getPanelImage().addMouseListener(this);

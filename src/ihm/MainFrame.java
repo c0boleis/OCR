@@ -1,6 +1,7 @@
 package ihm;
 
 import java.awt.BorderLayout;
+import java.awt.Toolkit;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -40,7 +41,8 @@ public class MainFrame extends JFrame{
 
 	public MainFrame() {
 		super("OCR");
-		this.setSize(600, 600);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		this.setSize((int) tk.getScreenSize().getWidth(), 600);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setJMenuBar(getMainMenuBar());
 		this.setLayout(new BorderLayout());

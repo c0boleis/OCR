@@ -146,8 +146,6 @@ public class PanelOptions extends JPanel {
 					init();
 					if(panel != null) {
 						add(panel, BorderLayout.CENTER);
-//						panel.doLayout();
-//						panel.repaint();
 					}
 					PanelOCR.get().refreshOptions();
 				}

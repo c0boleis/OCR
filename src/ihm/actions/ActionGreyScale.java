@@ -35,6 +35,7 @@ public class ActionGreyScale extends ActionOcr{
 	private JTextField getTextField() {
 		if(textField == null) {
 			textField = new JTextField();
+			textField.setText("155");
 		}
 		return textField;
 	}
@@ -49,7 +50,7 @@ public class ActionGreyScale extends ActionOcr{
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					BufferedImage bufferedImage = PanelOCR.getImage();
+					BufferedImage bufferedImage = getImageStart();
 					int sInt = -1;
 					try {
 						sInt = Integer.parseInt(getTextField().getText().trim());
@@ -62,8 +63,8 @@ public class ActionGreyScale extends ActionOcr{
 					ImageFilter filter = new SeuilBlackFilter(sInt);  
 					ImageProducer producer = new FilteredImageSource(bufferedImage.getSource(), filter);  
 					Image image = Toolkit.getDefaultToolkit().createImage(producer);  
-
-					PanelOCR.setImage(ImageUtil.toBufferedImage(image));
+					setImageEndAction(ImageUtil.toBufferedImage(image));
+					PanelOCR.setImage(getImageEndAction());
 					setDone(true);
 				}
 			});
@@ -84,7 +85,7 @@ public class ActionGreyScale extends ActionOcr{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		this.setDone(false);
-		this.setActive(true);
+		this.setActive(!isActive());
 	}
 
 	@Override

@@ -40,6 +40,7 @@ public class ActionOpen extends ActionOcr{
 		try {
 			BufferedImage image = ImageIO.read(file);
 			PanelOCR.setImage(image);
+			this.setImageEndAction(image);
 			PanelOCR.get().repaint();
 			this.setDone(true);
 		} catch (IOException e1) {

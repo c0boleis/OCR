@@ -1,5 +1,6 @@
 package ihm.actions;
 
+import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,8 @@ public abstract class ActionOcr extends AbstractAction {
 	private static final Logger LOGGER = Logger.getLogger(ActionOcr.class);
 	
 	private boolean active = false;
+	
+	private BufferedImage imageEndAction;
 	
 	private static List<ActionOcr> actions = new ArrayList<ActionOcr>();
 	
@@ -194,11 +197,31 @@ public abstract class ActionOcr extends AbstractAction {
 	/**
 	 * @param done the done to set
 	 */
-	public void setDone(boolean done) {
+	public final void setDone(boolean done) {
 		boolean oldDone = this.done;
 		this.done = done;
 		if(oldDone != this.done) {
 			fireDoneChange(oldDone, this.done);
+			checkEnable();
+		}
+		if(!this.done) {
+			resetDoneAfter();
+			checkEnable();
+		}
+	}
+	
+	private void resetDoneAfter() {
+		String className = getClass().getName();
+		if(className.equals(ActionOpen.class.getName())) {
+			getAction(ActionRescale.class.getName()).setDone(false);
+		}else if(className.equals(ActionRescale.class.getName())) {
+			getAction(ActionGreyScale.class.getName()).setDone(false);
+		}else if(className.equals(ActionGreyScale.class.getName())) {
+			getAction(ActionGomme.class.getName()).setDone(false);
+		}else if(className.equals(ActionGomme.class.getName())) {
+			getAction(ActionFindLine.class.getName()).setDone(false);
+		}else if(className.equals(ActionFindLine.class.getName())) {
+			getAction(ActionOCRCalcul.class.getName()).setDone(false);
 		}
 	}
 	
@@ -208,7 +231,6 @@ public abstract class ActionOcr extends AbstractAction {
 		ActionGreyScale actionGreyScale= (ActionGreyScale) getAction(ActionGreyScale.class.getName());
 		ActionGomme actionGomme= (ActionGomme) getAction(ActionGomme.class.getName());
 		ActionFindLine actionFindLine= (ActionFindLine) getAction(ActionFindLine.class.getName());
-		ActionFindCharacter actionFindCharacter= (ActionFindCharacter) getAction(ActionFindCharacter.class.getName());
 		ActionOCRCalcul actionOcr= (ActionOCRCalcul) getAction(ActionOCRCalcul.class.getName());
 
 		actionOpen.setEnable(true);
@@ -221,9 +243,41 @@ public abstract class ActionOcr extends AbstractAction {
 		
 		actionFindLine.setEnable(actionGomme.isDone());
 		
-		actionFindCharacter.setEnable(actionFindLine.isDone());
 		
-		actionOcr.setEnable(actionFindCharacter.isDone());
+		actionOcr.setEnable(actionFindLine.isDone());
+	}
+
+	/**
+	 * @return the imageEndAction
+	 */
+	public BufferedImage getImageEndAction() {
+		return imageEndAction;
+	}
+	
+	/**
+	 * 
+	 * @param image {@link BufferedImage}
+	 */
+	protected void setImageEndAction(BufferedImage image) {
+		this.imageEndAction = image;
+	}
+	
+	public BufferedImage getImageStart() {
+		String className = getClass().getName();
+		if(className.equals(ActionOpen.class.getName())) {
+			return null;
+		}else if(className.equals(ActionRescale.class.getName())) {
+			return ActionOcr.getAction(ActionOpen.class.getName()).getImageEndAction();
+		}else if(className.equals(ActionGreyScale.class.getName())) {
+			return ActionOcr.getAction(ActionRescale.class.getName()).getImageEndAction();
+		}else if(className.equals(ActionGomme.class.getName())) {
+			return ActionOcr.getAction(ActionGreyScale.class.getName()).getImageEndAction();
+		}else if(className.equals(ActionFindLine.class.getName())) {
+			return ActionOcr.getAction(ActionGomme.class.getName()).getImageEndAction();
+		}else if(className.equals(ActionOCRCalcul.class.getName())) {
+			return ActionOcr.getAction(ActionFindLine.class.getName()).getImageEndAction();
+		}
+		return null;
 	}
 
 
