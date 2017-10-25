@@ -2,7 +2,6 @@ package ihm.ocr;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,9 @@ import org.apache.log4j.Logger;
 
 import ihm.PanelImageListener;
 import ihm.PanelOCR;
+import model.CharacterOCR;
 import model.LineOCR;
+import model.LineOCRListener;
 
 public class PanelFindLine extends JPanel implements PanelImageListener{
 
@@ -28,10 +29,13 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 	public PanelFindLine(LineOCR[] lines) {
 		super();
 		init(lines);
-		PanelOCR.get().getPanelImage().addPanelImageListener(this);
+	}
+	
+	public PanelFindLine() {
+		super();
 	}
 
-	private void init(LineOCR[] lines) {
+	public void init(LineOCR[] lines) {
 		this.setOpaque(false);
 		this.setLayout(null);
 		double zoomFact = PanelOCR.get().getPanelImage().getZoomFact();
@@ -46,6 +50,7 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 		int h = (int) ((line.getPosition()+line.getImage().getHeight())*zoomFact);
 		this.setSize(w, h);
 		LOGGER.debug("init w: "+w+"\th: "+h);
+		PanelOCR.get().getPanelImage().addPanelImageListener(this);
 	}
 
 	@Override
@@ -89,5 +94,29 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 	public PanelLineOCR[] getPanelLines() {
 		return this.panelLines.toArray(new PanelLineOCR[0]);
 	}
+	
+	public CharacterOCR[] getSelectedCharacter() {
+		List<CharacterOCR> selectedCharOCRs = new ArrayList<CharacterOCR>();
+		for(PanelLineOCR panel : this.panelLines) {
+			PanelCharacterOCR[] charOcrs = panel.getPanelsCharacterOCR();
+			for(PanelCharacterOCR charOcr : charOcrs) {
+				if(charOcr.isSelected()) {
+					selectedCharOCRs.add(charOcr.getCharacterOCR());
+				}
+			}
+		}
+		return selectedCharOCRs.toArray(new CharacterOCR[0]);
+	}
+	
+	public void unSelectAll() {
+		for(PanelLineOCR panel : this.panelLines) {
+			PanelCharacterOCR[] charOcrs = panel.getPanelsCharacterOCR();
+			for(PanelCharacterOCR charOcr : charOcrs) {
+				charOcr.setSelected(false);
+			}
+		}
+		this.repaint();
+	}
+
 
 }

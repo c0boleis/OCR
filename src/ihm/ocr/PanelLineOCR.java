@@ -10,8 +10,9 @@ import org.apache.log4j.Logger;
 import ihm.PanelOCR;
 import model.CharacterOCR;
 import model.LineOCR;
+import model.LineOCRListener;
 
-public class PanelLineOCR extends JPanel {
+public class PanelLineOCR extends JPanel implements LineOCRListener{
 
 	/**
 	 * 
@@ -26,6 +27,7 @@ public class PanelLineOCR extends JPanel {
 	
 	public PanelLineOCR(LineOCR line) {
 		this.lineOCR = line;
+		this.lineOCR.addLineOCRListener(this);
 		init();
 	}
 	
@@ -72,6 +74,30 @@ public class PanelLineOCR extends JPanel {
 	 */
 	public PanelCharacterOCR[] getPanelsCharacterOCR() {
 		return panels.toArray(new PanelCharacterOCR[0]);
+	}
+
+	@Override
+	public void characterOCRAdd(CharacterOCR characterOCR) {
+		this.repaint();
+	}
+
+	@Override
+	public void characterOCRemove(CharacterOCR characterOCR) {
+		
+		PanelCharacterOCR panel = getPanelCharacterOCR(characterOCR);
+		this.remove(panel);
+		this.panels.remove(panel);
+		this.repaint();
+	}
+	
+	private PanelCharacterOCR getPanelCharacterOCR(CharacterOCR characterOCR) {
+		PanelCharacterOCR[] tmp = getPanelsCharacterOCR();
+		for(PanelCharacterOCR panelCharacterOCR : tmp) {
+			if(panelCharacterOCR.getCharacterOCR().equals(characterOCR)) {
+				return panelCharacterOCR;
+			}
+		}
+		return null;
 	}
 
 }

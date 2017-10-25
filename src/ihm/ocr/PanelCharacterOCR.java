@@ -99,6 +99,10 @@ public class PanelCharacterOCR extends JPanel implements MouseListener{
 	public boolean isSelected() {
 		return selected;
 	}
+	
+	protected void setSelected(boolean b) {
+		this.selected = b;
+	}
 
 	public void updateZoom(double newZoom) {
 		int w = (int) (this.characterOCR.getImage().getWidth()*newZoom);
