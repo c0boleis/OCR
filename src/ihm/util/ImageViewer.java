@@ -17,7 +17,7 @@ public class ImageViewer extends JFrame{
 	
 	public ImageViewer(BufferedImage image,String titre) {
 		super(titre);
-		this.setTitle("Image view");
+		this.setTitle(titre);
 		this.setSize(400,400);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		JPanel panel = new JPanel() {

@@ -14,9 +14,14 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.asprise.ocr.sample.PanelLogging;
+
+import filter.ImageUtilCalcul;
+import filter.SeuilBlackDisplayFilter;
 import filter.SeuilBlackFilter;
 import ihm.ImageUtil;
 import ihm.PanelOCR;
+import ihm.options.PanelSeuil;
 
 public class ActionGreyScale extends ActionOcr{
 
@@ -28,6 +33,10 @@ public class ActionGreyScale extends ActionOcr{
 	private JPanel panelOption;
 
 	private JTextField textField;
+	
+	private PanelSeuil panelSeuil;
+	
+	private int greyFact = -1;
 
 	/**
 	 * @return the textField
@@ -60,7 +69,8 @@ public class ActionGreyScale extends ActionOcr{
 					if(sInt<1 || sInt>255) {
 						return;
 					}
-					ImageFilter filter = new SeuilBlackFilter(sInt);  
+					greyFact = sInt;
+					ImageFilter filter = new SeuilBlackFilter((int)getPanelSeuil().getValMin(),(int)getPanelSeuil().getValMax());  
 					ImageProducer producer = new FilteredImageSource(bufferedImage.getSource(), filter);  
 					Image image = Toolkit.getDefaultToolkit().createImage(producer);  
 					setImageEndAction(ImageUtil.toBufferedImage(image));
@@ -93,10 +103,37 @@ public class ActionGreyScale extends ActionOcr{
 		if(panelOption == null) {
 			panelOption = new JPanel();
 			panelOption.setLayout(new BorderLayout());
-			panelOption.add(getTextField(), BorderLayout.CENTER);
+			panelOption.add(getPanelSeuil(), BorderLayout.CENTER);
+			panelOption.add(getTextField(), BorderLayout.NORTH);
 			panelOption.add(getButtonStart(), BorderLayout.SOUTH);
+			getPanelSeuil().repaint();
 		}
 		return panelOption;
+	}
+
+	/**
+	 * @return the greyFact
+	 */
+	public int getGreyFact() {
+		return greyFact;
+	}
+
+	/**
+	 * @return the panelSeuil
+	 */
+	public PanelSeuil getPanelSeuil() {
+		if(panelSeuil == null) {
+			panelSeuil = new PanelSeuil(ImageUtilCalcul.greyTabMoy(getImageStart()));
+		}
+		return panelSeuil;
+	}
+	
+	public void displaySeuil() {
+		ImageFilter filter = new SeuilBlackDisplayFilter((int)getPanelSeuil().getValMin(),(int)getPanelSeuil().getValMax());
+		ImageProducer producer = new FilteredImageSource(getImageStart().getSource(), filter);  
+		Image image = Toolkit.getDefaultToolkit().createImage(producer);  
+		PanelOCR.setImage(ImageUtil.toBufferedImage(image));
+		PanelOCR.get().repaint();
 	}
 
 }

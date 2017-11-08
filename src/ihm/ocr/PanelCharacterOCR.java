@@ -27,13 +27,16 @@ public class PanelCharacterOCR extends JPanel implements MouseListener{
 	
 	private boolean selected = false;
 	
-	public PanelCharacterOCR(CharacterOCR character) {
+	private PanelLineOCR panelLineOCR;
+	
+	public PanelCharacterOCR(CharacterOCR character,PanelLineOCR panelLine) {
 		this.characterOCR = character;
 		int w = this.characterOCR.getImage().getWidth();
 		int h = this.characterOCR.getImage().getHeight();
 		updateZoom(PanelOCR.get().getPanelImage().getZoomFact());
 		this.addMouseListener(this);
 		LOGGER.debug("init w: "+w+"\th: "+h);
+		this.panelLineOCR = panelLine;
 	}
 
 	@Override
@@ -73,7 +76,7 @@ public class PanelCharacterOCR extends JPanel implements MouseListener{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		this.selected = !this.selected;
+		this.setSelected(!this.isSelected());
 		this.repaint();
 	}
 
@@ -102,12 +105,28 @@ public class PanelCharacterOCR extends JPanel implements MouseListener{
 	
 	protected void setSelected(boolean b) {
 		this.selected = b;
+		if(this.isSelected()) {
+			getPanelFinedLine().fireCharacterOCRSelected(this);
+		}else {
+			getPanelFinedLine().fireCharacterOCRUnSelected(this);
+		}
 	}
 
 	public void updateZoom(double newZoom) {
 		int w = (int) (this.characterOCR.getImage().getWidth()*newZoom);
 		int h = (int) (this.characterOCR.getImage().getHeight()*newZoom);
 		this.setSize(w,h);
+	}
+	
+	private PanelFindLine getPanelFinedLine() {
+		return this.panelLineOCR.getPanelFindLine();
+	}
+
+	/**
+	 * @return the panelLineOCR
+	 */
+	public PanelLineOCR getPanelLineOCR() {
+		return panelLineOCR;
 	}
 
 }

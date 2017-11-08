@@ -191,8 +191,10 @@ public class PanelImage extends JPanel{
 					if(wheelWalue>0) {
 						fact = 1.25;
 					}
+					double oldZoom =  zoomFact;
 					zoomFact = zoomFact*fact;
-					System.out.println("wheelWalue: "+wheelWalue+"\tzoomFact: "+zoomFact);
+					fireZoomChange(oldZoom, zoomFact);
+					//System.out.println("wheelWalue: "+wheelWalue+"\tzoomFact: "+zoomFact);
 					repaint();
 				}
 			};

@@ -1,9 +1,18 @@
 package model;
 
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 
 import org.apache.log4j.Logger;
+
+import filter.SeuilBlackFilter;
+import ihm.ImageUtil;
+import ihm.PanelOCR;
 
 public class CharacterOCR {
 	
@@ -16,15 +25,21 @@ public class CharacterOCR {
 	
 	private BufferedImage imageFirst;
 	
+	private int greyFactMin = -1;
+	
+	private int greyFactMax = -1;
+	
 	private boolean useImageGrey = false;
 	
 	private LineOCR lineOCR;
 
-	public CharacterOCR(int p,LineOCR line, BufferedImage imgFirst, BufferedImage imgGrey) {
+	public CharacterOCR(int p,int greyFMin,int greyFMax, LineOCR line, BufferedImage imgFirst, BufferedImage imgGrey) {
 		this.position = p;
 		this.imageGreyScale = imgGrey;
 		this.imageFirst = imgFirst;
 		this.lineOCR = line;
+		this.greyFactMin = greyFMin;
+		this.greyFactMax = greyFMax;
 	}
 
 	/* (non-Javadoc)
@@ -126,7 +141,64 @@ public class CharacterOCR {
 	public void delete() {
 		this.lineOCR.removeCharacter(this);
 	}
+
+	/**
+	 * @return the greyFact
+	 */
+	public int getGreyFactMin() {
+		return greyFactMin;
+	}
 	
+	public int getGreyFactMax() {
+		return greyFactMax;
+	}
+
+	/**
+	 * @param greyFact the greyFact to set
+	 */
+	public void setGreyFact(int greyFact) {
+		if(greyFact<0 || greyFact >255) {
+			throw new IllegalArgumentException();
+		}
+		this.greyFactMin = greyFact;
+		ImageFilter filter = new SeuilBlackFilter(greyFactMin,greyFactMax);  
+		ImageProducer producer = new FilteredImageSource(this.imageFirst.getSource(), filter);  
+		Image image = Toolkit.getDefaultToolkit().createImage(producer);  
+		this.imageGreyScale = ImageUtil.toBufferedImage(image);
+		
+	}
+	
+	public void setGreyFactMax(int greyFact) {
+		if(greyFact<0 || greyFact >255) {
+			throw new IllegalArgumentException();
+		}
+		this.greyFactMax = greyFact;
+		ImageFilter filter = new SeuilBlackFilter(greyFactMin,greyFactMax);  
+		ImageProducer producer = new FilteredImageSource(this.imageFirst.getSource(), filter);  
+		Image image = Toolkit.getDefaultToolkit().createImage(producer);  
+		this.imageGreyScale = ImageUtil.toBufferedImage(image);
+		
+	}
+	
+	public void setGreyFactM(int greyFactMin,int greyFactMax) {
+		if(greyFactMin<0 || greyFactMin >255) {
+			throw new IllegalArgumentException();
+		}
+		if(greyFactMax<0 || greyFactMax >255) {
+			throw new IllegalArgumentException();
+		}
+		this.greyFactMax = greyFactMax;
+		this.greyFactMin = greyFactMin;
+		ImageFilter filter = new SeuilBlackFilter(this.greyFactMin,this.greyFactMax);  
+		ImageProducer producer = new FilteredImageSource(this.imageFirst.getSource(), filter);  
+		Image image = Toolkit.getDefaultToolkit().createImage(producer);  
+		this.imageGreyScale = ImageUtil.toBufferedImage(image);
+		
+	}
+	
+	public boolean isUseImageGrey() {
+		return this.useImageGrey;
+	}
 	
 
 }

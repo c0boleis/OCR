@@ -25,9 +25,12 @@ public class PanelLineOCR extends JPanel implements LineOCRListener{
 	
 	private List<PanelCharacterOCR> panels = new ArrayList<PanelCharacterOCR>();
 	
-	public PanelLineOCR(LineOCR line) {
+	private PanelFindLine panelFindLine;
+	
+	public PanelLineOCR(LineOCR line,PanelFindLine panelFind) {
 		this.lineOCR = line;
 		this.lineOCR.addLineOCRListener(this);
+		this.panelFindLine = panelFind;
 		init();
 	}
 	
@@ -37,7 +40,7 @@ public class PanelLineOCR extends JPanel implements LineOCRListener{
 		this.setLayout(null);
 		double zoomFact = PanelOCR.get().getPanelImage().getZoomFact();
 		for(CharacterOCR character : characterOCRs) {
-			PanelCharacterOCR panel = new PanelCharacterOCR(character);
+			PanelCharacterOCR panel = new PanelCharacterOCR(character,this);
 			panel.setLocation((int) (character.getPosition()*zoomFact), 0);
 			panels.add(panel);
 			this.add(panel);
@@ -98,6 +101,13 @@ public class PanelLineOCR extends JPanel implements LineOCRListener{
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return the panelFindLine
+	 */
+	public PanelFindLine getPanelFindLine() {
+		return panelFindLine;
 	}
 
 }

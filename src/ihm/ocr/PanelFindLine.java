@@ -13,7 +13,6 @@ import ihm.PanelImageListener;
 import ihm.PanelOCR;
 import model.CharacterOCR;
 import model.LineOCR;
-import model.LineOCRListener;
 
 public class PanelFindLine extends JPanel implements PanelImageListener{
 
@@ -26,11 +25,13 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 
 	private List<PanelLineOCR> panelLines = new ArrayList<PanelLineOCR>();
 
+	private List<PanelOCRListener> panelOCRListeners = new ArrayList<PanelOCRListener>();
+
 	public PanelFindLine(LineOCR[] lines) {
 		super();
 		init(lines);
 	}
-	
+
 	public PanelFindLine() {
 		super();
 	}
@@ -40,7 +41,7 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 		this.setLayout(null);
 		double zoomFact = PanelOCR.get().getPanelImage().getZoomFact();
 		for(LineOCR line : lines) {
-			PanelLineOCR panel = new PanelLineOCR(line);
+			PanelLineOCR panel = new PanelLineOCR(line,this);
 			panel.setLocation(0, (int) (line.getPosition()*zoomFact));
 			panelLines.add(panel);
 			this.add(panel);
@@ -85,16 +86,17 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 			panel.updateZoom(newZoom);
 			line = panel.getLineOCR();
 		}
-		int w = (int) (panelLines.get(panelLines.size()-1).getWidth()*newZoom);
+		int w = (int) (panelLines.get(panelLines.size()-1).getWidth());
 		int h = (int) ((line.getPosition()+line.getImage().getHeight())*newZoom);
 		this.setSize(w, h);
+		this.repaint();
 		//		this.setPreferredSize(new Dimension(w, h));
 	}
 
 	public PanelLineOCR[] getPanelLines() {
 		return this.panelLines.toArray(new PanelLineOCR[0]);
 	}
-	
+
 	public CharacterOCR[] getSelectedCharacter() {
 		List<CharacterOCR> selectedCharOCRs = new ArrayList<CharacterOCR>();
 		for(PanelLineOCR panel : this.panelLines) {
@@ -107,7 +109,18 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 		}
 		return selectedCharOCRs.toArray(new CharacterOCR[0]);
 	}
-	
+
+	public CharacterOCR[] getAllCharacter() {
+		List<CharacterOCR> selectedCharOCRs = new ArrayList<CharacterOCR>();
+		for(PanelLineOCR panel : this.panelLines) {
+			PanelCharacterOCR[] charOcrs = panel.getPanelsCharacterOCR();
+			for(PanelCharacterOCR charOcr : charOcrs) {
+				selectedCharOCRs.add(charOcr.getCharacterOCR());
+			}
+		}
+		return selectedCharOCRs.toArray(new CharacterOCR[0]);
+	}
+
 	public void unSelectAll() {
 		for(PanelLineOCR panel : this.panelLines) {
 			PanelCharacterOCR[] charOcrs = panel.getPanelsCharacterOCR();
@@ -116,6 +129,32 @@ public class PanelFindLine extends JPanel implements PanelImageListener{
 			}
 		}
 		this.repaint();
+	}
+
+	public PanelOCRListener[] getListeners() {
+		return this.panelOCRListeners.toArray(new PanelOCRListener[0]);
+	}
+
+	public void addPanelOCRListener(PanelOCRListener listener) {
+		this.panelOCRListeners.add(listener);
+	}
+
+	public boolean removePanelOCRListener(PanelOCRListener listener) {
+		return this.panelOCRListeners.remove(listener);
+	}
+
+	protected void fireCharacterOCRSelected(PanelCharacterOCR panelCharacterOCR) {
+		PanelOCRListener[] listeners = getListeners();
+		for(PanelOCRListener listener : listeners) {
+			listener.characterOCRSelected(panelCharacterOCR);
+		}
+	}
+
+	protected void fireCharacterOCRUnSelected(PanelCharacterOCR panelCharacterOCR) {
+		PanelOCRListener[] listeners = getListeners();
+		for(PanelOCRListener listener : listeners) {
+			listener.characterOCRUnSelected(panelCharacterOCR);
+		}
 	}
 
 

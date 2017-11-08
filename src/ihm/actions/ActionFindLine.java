@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.IOException;
@@ -19,16 +20,23 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 
 import filter.FilterLine;
+import filter.SeuilBlackFilter;
 import ihm.ImageUtil;
 import ihm.PanelOCR;
 import ihm.ocr.PanelCharacterOCR;
 import ihm.ocr.PanelFindLine;
-import ihm.util.ImageViewer;
+import ihm.ocr.PanelOCRListener;
 import model.CharacterOCR;
 import model.LineOCR;
 
@@ -50,10 +58,143 @@ public class ActionFindLine extends ActionOcr {
 	private JButton buttonJoin;
 
 	private JButton buttonChangeImage;
+	
+	private JButton buttonSaveImageLetter;
 
 	private JComboBox<String> comboBoxImages;
 
 	private PanelFindLine panelFindLine;
+	
+	private JPanel panelChar;
+	
+	private JToggleButton toggleButtonGreyOrFirst;
+	
+	private JTextField textFieldGreyFact;
+	
+	private JButton buttonAutoCalcul;
+	
+	private JButton buttonRefresh;
+	
+	private PanelOCRListener panelOCRListener;
+	
+	private PanelCharacterOCR selctedPanelCharacterOCR;
+
+	/**
+	 * @return the panelChar
+	 */
+	private JPanel getPanelChar() {
+		if(panelChar == null) {
+			panelChar= new JPanel();
+			panelChar.setBorder(new TitledBorder("Character"));
+			panelChar.setLayout(new BorderLayout());
+			JPanel panelSouth = new JPanel();
+			panelSouth.setLayout(new BorderLayout());
+			panelSouth.add(getButtonAutoCalcul(), BorderLayout.WEST);
+			panelSouth.add(getButtonRefresh(),BorderLayout.CENTER);
+			panelChar.add(panelSouth,BorderLayout.SOUTH);
+			panelChar.add(getToggleButtonGreyOrFirst(), BorderLayout.NORTH);
+			JLabel labelFact = new JLabel("Fact: ");
+			panelChar.add(labelFact, BorderLayout.WEST);
+			panelChar.add(getTextFieldGreyFact(), BorderLayout.CENTER);
+		}
+		return panelChar;
+	}
+
+	/**
+	 * @return the toggleButtonGreyOrFirst
+	 */
+	private JToggleButton getToggleButtonGreyOrFirst() {
+		if(toggleButtonGreyOrFirst==null) {
+			toggleButtonGreyOrFirst = new JToggleButton("Grey/First");
+			toggleButtonGreyOrFirst.addChangeListener(new ChangeListener() {
+				
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					if(selctedPanelCharacterOCR==null) {
+						return;
+					}
+					if(toggleButtonGreyOrFirst.isSelected()) {
+						selctedPanelCharacterOCR.getCharacterOCR().useImageFirst();
+					}else {
+						selctedPanelCharacterOCR.getCharacterOCR().useImageGreyScale();
+					}
+				}
+			});
+		}
+		return toggleButtonGreyOrFirst;
+	}
+
+	/**
+	 * @return the textFieldGreyFact
+	 */
+	private JTextField getTextFieldGreyFact() {
+		if(textFieldGreyFact == null) {
+			textFieldGreyFact = new JTextField();
+		}
+		return textFieldGreyFact;
+	}
+
+	/**
+	 * @return the buttonAutoCalcul
+	 */
+	private JButton getButtonAutoCalcul() {
+		if(buttonAutoCalcul == null) {
+			buttonAutoCalcul = new JButton("Auto fact");
+			buttonAutoCalcul.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(selctedPanelCharacterOCR==null) {
+						return;
+					}
+					CharacterOCR charOCR = selctedPanelCharacterOCR.getCharacterOCR();
+					charOCR.useImageFirst();
+					int k = filter.ImageUtilCalcul.greyMoy(charOCR.getImage());
+					int fact = ((255-k)/4)+k;
+					getTextFieldGreyFact().setText(String.valueOf(fact));
+				}
+			});
+		}
+		return buttonAutoCalcul;
+	}
+
+	/**
+	 * @return the buttonRefresh
+	 */
+	private JButton getButtonRefresh() {
+		if(buttonRefresh == null) {
+			buttonRefresh = new JButton("Refresh");
+			buttonRefresh.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(selctedPanelCharacterOCR==null) {
+						return;
+					}
+					panelFindLine.repaint();
+					CharacterOCR charOCR = selctedPanelCharacterOCR.getCharacterOCR();
+					int sInt = -1;
+					try {
+						sInt = Integer.parseInt(getTextFieldGreyFact().getText().trim());
+					}catch (NumberFormatException exp) {
+						return;
+					}
+					if(sInt<1 || sInt>255) {
+						return;
+					}
+					ImageFilter filter = new SeuilBlackFilter(sInt-5,sInt+5);  
+					charOCR.useImageFirst();
+					charOCR.setGreyFact(sInt);
+					ImageProducer producer = new FilteredImageSource(charOCR.getImage().getSource(), filter);  
+					Image image = Toolkit.getDefaultToolkit().createImage(producer);  
+					charOCR.setImageGrey(ImageUtil.toBufferedImage(image));
+					charOCR.useImageGreyScale();
+				}
+			});
+		}
+		return buttonRefresh;
+	}
+
 
 	private JButton getButtonDelette() {
 		if(buttonDelette == null) {
@@ -117,6 +258,8 @@ public class ActionFindLine extends ActionOcr {
 			linesOCR.clear();
 			rectangleChar.clear();
 			rectangleLine.clear();
+			int greyFactMin = (int) ((ActionGreyScale)ActionOcr.getAction(ActionGreyScale.class.getName())).getPanelSeuil().getValMin();
+			int greyFactMax = (int) ((ActionGreyScale)ActionOcr.getAction(ActionGreyScale.class.getName())).getPanelSeuil().getValMax();
 			try {
 				ActionOcr actionRescale = ActionOcr.getAction(ActionRescale.class.getName());
 				BufferedImage imageSGrey = getImageStart();
@@ -155,7 +298,7 @@ public class ActionFindLine extends ActionOcr {
 						indexStartChar = p1.y;
 						BufferedImage imgCharGrey = imgGreyScale.getSubimage(p1.x, 0, p1.y-p1.x, imgGreyScale.getHeight());
 						BufferedImage imgCharFirst = imgFirst.getSubimage(p1.x, 0, p1.y-p1.x, imgGreyScale.getHeight());
-						lineOCR.addCharacter(new CharacterOCR(p1.x,lineOCR,imgCharFirst, imgCharGrey));
+						lineOCR.addCharacter(new CharacterOCR(p1.x,greyFactMin,greyFactMax,lineOCR,imgCharFirst, imgCharGrey));
 						ImageIO.write(imgCharGrey, "png", new File("tmp\\tmp_find_line_"+indexLine+"_char"+indexChar+".png"));
 						indexChar++;
 					}
@@ -194,6 +337,8 @@ public class ActionFindLine extends ActionOcr {
 			panelChangeImage.add(getComboBoxImages(), BorderLayout.CENTER);
 			panelChangeImage.add(getButtonChangeImage(), BorderLayout.EAST);
 			panelOption.add(panelChangeImage);
+			panelOption.add(getButtonSaveImageLetter());
+			panelOption.add(getPanelChar());
 		}
 
 		return panelOption;
@@ -263,7 +408,69 @@ public class ActionFindLine extends ActionOcr {
 	public PanelFindLine getPanelFindLine() {
 		if(panelFindLine == null) {
 			panelFindLine = new PanelFindLine();
+			panelFindLine.addPanelOCRListener(getPanelOCRListener());
 		}
 		return panelFindLine;
+	}
+
+	/**
+	 * @return the panelOCRListener
+	 */
+	public PanelOCRListener getPanelOCRListener() {
+		if(panelOCRListener == null) {
+			panelOCRListener = new PanelOCRListener() {
+				
+				@Override
+				public void characterOCRUnSelected(PanelCharacterOCR charOCR) {
+//					changeSelection(charOCR);
+					
+				}
+				
+				@Override
+				public void characterOCRSelected(PanelCharacterOCR charOCR) {
+					changeSelection(charOCR);
+					LOGGER.debug("charOCR selected");
+				}
+			};
+		}
+		return panelOCRListener;
+	}
+	
+	private void changeSelection(PanelCharacterOCR charOCR) {
+		selctedPanelCharacterOCR = charOCR;
+		if(charOCR.getCharacterOCR().isUseImageGrey()) {
+			this.getToggleButtonGreyOrFirst().setSelected(true);
+		}else {
+			this.getToggleButtonGreyOrFirst().setSelected(false);
+		}
+		this.getTextFieldGreyFact().setText(String.valueOf(charOCR.getCharacterOCR().getGreyFactMin()));
+	}
+
+	/**
+	 * @return the buttonSaveImageLetter
+	 */
+	public JButton getButtonSaveImageLetter() {
+		if(buttonSaveImageLetter == null) {
+			buttonSaveImageLetter = new JButton();
+			buttonSaveImageLetter.setText("Save Letter");
+			buttonSaveImageLetter.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					CharacterOCR[] tmp = getPanelFindLine().getAllCharacter();
+					int index = 0;
+					for(CharacterOCR c : tmp) {
+						c.useImageFirst();
+						try {
+							ImageIO.write(c.getImage(), "png", new File("tmp\\l_"+index+".png"));
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						index++;
+					}
+				}
+			});
+		}
+		return buttonSaveImageLetter;
 	}
 }
