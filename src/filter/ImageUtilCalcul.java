@@ -30,7 +30,7 @@ public class ImageUtilCalcul {
 	public static int[] greyTabMoy(BufferedImage image) {
 		int width = image.getWidth();
 		int height= image.getHeight();
-		int[] out = new int[255];
+		int[] out = new int[256];
 		for(int index = 0;index<out.length;index++) {
 			out[index] = 0;
 		}
@@ -49,5 +49,59 @@ public class ImageUtilCalcul {
 		}
 		return out;
 	}
+	
+	public static int[] greyTabRed(BufferedImage image) {
+		int width = image.getWidth();
+		int height= image.getHeight();
+		int[] out = new int[256];
+		for(int index = 0;index<out.length;index++) {
+			out[index] = 0;
+		}
+		int[] dataBuffInt = image.getRGB(0, 0, width, height, null, 0, width);
+		for(int rgb : dataBuffInt) {
+			int r = (int) ((rgb &  0x00ff0000) >> 16);
+			out[r]++;
+		}
+		for(int index = 0;index<out.length;index++) {
+			LOGGER.debug(index+": "+out[index]);
+		}
+		return out;
+	}
+	
+	public static int[] greyTabGreen(BufferedImage image) {
+		int width = image.getWidth();
+		int height= image.getHeight();
+		int[] out = new int[256];
+		for(int index = 0;index<out.length;index++) {
+			out[index] = 0;
+		}
+		int[] dataBuffInt = image.getRGB(0, 0, width, height, null, 0, width);
+		for(int rgb : dataBuffInt) {
+			int g = (int) ((rgb &  0x0000ff00) >> 8);
+			out[g]++;
+		}
+		for(int index = 0;index<out.length;index++) {
+			LOGGER.debug(index+": "+out[index]);
+		}
+		return out;
+	}
 
+	public static int[] greyTabBlue(BufferedImage image) {
+		int width = image.getWidth();
+		int height= image.getHeight();
+		int[] out = new int[256];
+		for(int index = 0;index<out.length;index++) {
+			out[index] = 0;
+		}
+		int[] dataBuffInt = image.getRGB(0, 0, width, height, null, 0, width);
+		for(int rgb : dataBuffInt) {
+			int b = (int) (rgb &  0x000000ff);
+
+			out[b]++;
+		}
+		for(int index = 0;index<out.length;index++) {
+			LOGGER.debug(index+": "+out[index]);
+		}
+		return out;
+	}
 }

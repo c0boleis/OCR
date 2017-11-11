@@ -22,6 +22,7 @@ import filter.SeuilBlackFilter;
 import ihm.ImageUtil;
 import ihm.PanelOCR;
 import ihm.options.PanelSeuil;
+import ihm.options.PanelSeuilRGB;
 
 public class ActionGreyScale extends ActionOcr{
 
@@ -34,7 +35,7 @@ public class ActionGreyScale extends ActionOcr{
 
 	private JTextField textField;
 	
-	private PanelSeuil panelSeuil;
+	private PanelSeuilRGB panelSeuil;
 	
 	private int greyFact = -1;
 
@@ -70,11 +71,12 @@ public class ActionGreyScale extends ActionOcr{
 						return;
 					}
 					greyFact = sInt;
-					ImageFilter filter = new SeuilBlackFilter((int)getPanelSeuil().getValMin(),(int)getPanelSeuil().getValMax());  
-					ImageProducer producer = new FilteredImageSource(bufferedImage.getSource(), filter);  
-					Image image = Toolkit.getDefaultToolkit().createImage(producer);  
-					setImageEndAction(ImageUtil.toBufferedImage(image));
-					PanelOCR.setImage(getImageEndAction());
+					//TODO
+//					ImageFilter filter = new SeuilBlackFilter((int)getPanelSeuil().getValMin(),(int)getPanelSeuil().getValMax());  
+//					ImageProducer producer = new FilteredImageSource(bufferedImage.getSource(), filter);  
+//					Image image = Toolkit.getDefaultToolkit().createImage(producer);  
+//					setImageEndAction(ImageUtil.toBufferedImage(image));
+//					PanelOCR.setImage(getImageEndAction());
 					setDone(true);
 				}
 			});
@@ -121,15 +123,15 @@ public class ActionGreyScale extends ActionOcr{
 	/**
 	 * @return the panelSeuil
 	 */
-	public PanelSeuil getPanelSeuil() {
+	public PanelSeuilRGB getPanelSeuil() {
 		if(panelSeuil == null) {
-			panelSeuil = new PanelSeuil(ImageUtilCalcul.greyTabMoy(getImageStart()));
+			panelSeuil = new PanelSeuilRGB(getImageStart());
 		}
 		return panelSeuil;
 	}
 	
 	public void displaySeuil() {
-		ImageFilter filter = new SeuilBlackDisplayFilter((int)getPanelSeuil().getValMin(),(int)getPanelSeuil().getValMax());
+		ImageFilter filter = new SeuilBlackDisplayFilter(getPanelSeuil().getRGBSeuilFact());
 		ImageProducer producer = new FilteredImageSource(getImageStart().getSource(), filter);  
 		Image image = Toolkit.getDefaultToolkit().createImage(producer);  
 		PanelOCR.setImage(ImageUtil.toBufferedImage(image));

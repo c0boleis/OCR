@@ -258,8 +258,11 @@ public class ActionFindLine extends ActionOcr {
 			linesOCR.clear();
 			rectangleChar.clear();
 			rectangleLine.clear();
-			int greyFactMin = (int) ((ActionGreyScale)ActionOcr.getAction(ActionGreyScale.class.getName())).getPanelSeuil().getValMin();
-			int greyFactMax = (int) ((ActionGreyScale)ActionOcr.getAction(ActionGreyScale.class.getName())).getPanelSeuil().getValMax();
+			int greyFactMin = 0;
+			int greyFactMax = 155;
+			//TODO
+//			int greyFactMin = (int) ((ActionGreyScale)ActionOcr.getAction(ActionGreyScale.class.getName())).getPanelSeuil().getValMin();
+//			int greyFactMax = (int) ((ActionGreyScale)ActionOcr.getAction(ActionGreyScale.class.getName())).getPanelSeuil().getValMax();
 			try {
 				ActionOcr actionRescale = ActionOcr.getAction(ActionRescale.class.getName());
 				BufferedImage imageSGrey = getImageStart();

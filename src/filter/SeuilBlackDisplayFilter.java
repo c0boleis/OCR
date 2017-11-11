@@ -2,18 +2,17 @@ package filter;
 
 import java.awt.image.RGBImageFilter;
 
+import model.RGBSeuilFact;
+
 public class SeuilBlackDisplayFilter extends RGBImageFilter{
 
-	private int sueilMin = 155;
-
-	private int sueilMax = 155;
+	private RGBSeuilFact rgbSeuilFact;
 
 	public SeuilBlackDisplayFilter() {
 	}
 
-	public SeuilBlackDisplayFilter(int min,int max) {
-		this.sueilMin = min;
-		this.sueilMax = max;
+	public SeuilBlackDisplayFilter(RGBSeuilFact fact) {
+		this.rgbSeuilFact = fact;
 	}
 
 	/*
@@ -26,12 +25,17 @@ public class SeuilBlackDisplayFilter extends RGBImageFilter{
 		int g = (int) ((rgb &  0x0000ff00) >> 8);
 		int b = (int) (rgb &  0x000000ff);
 		//        System.out.println("r: "+r+"\tg: "+g+"\tb: "+b);
-		int grey = ((r+g+b)/3);
-		if(grey<=sueilMax && grey>=sueilMin) {
-			return (rgb & 0xff000000) | 0x000000ff;
-		}else {
-			return rgb ;
+		
+		if(r<=this.rgbSeuilFact.getFactRed().getValMax() && r>=this.rgbSeuilFact.getFactRed().getValMin()) {
+			if(g<=this.rgbSeuilFact.getFactGreen().getValMax() && g>=this.rgbSeuilFact.getFactGreen().getValMin()) {
+				if(b<=this.rgbSeuilFact.getFactBlue().getValMax() && b>=this.rgbSeuilFact.getFactBlue().getValMin()) {
+					return  (rgb & 0xff000000) | 0x000000ff;
+				}
+			}
 		}
+		
+		return rgb ;
+		
 	}
 
 }
